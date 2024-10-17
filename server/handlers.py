@@ -13,10 +13,10 @@ async def handle_models(message: IncomingMessage, session: ClientSession):
                 message.nack(requeue=True)
 
                 
-async def handle_sessions(message: IncomingMessage, session: ClientSession):
+async def handle_transactions(message: IncomingMessage, session: ClientSession):
     async with message.process():
         id = message.headers['X-Resource-ID']
-        async with await session.post(f'/models/{id}/sessions/', data=message.body) as response:
+        async with await session.post(f'/models/{id}/transactions/', data=message.body) as response:
             if response.status == 201:
                 message.ack()
             elif response.status == 404:

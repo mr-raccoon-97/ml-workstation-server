@@ -26,6 +26,16 @@ async def get_models_from_experiment(id: UUID = Path(...), experiments: Experime
         raise HTTPException(status_code.HTTP_404_NOT_FOUND, detail='Experiment not found')
     return await experiments.models.list(experiment)
 
+@router.get('/experiments/{id}/models/{hash}/')
+async def get_model_by_hash_from_experiment(id: UUID = Path(...), hash: str = Path(...), experiments: Experiments = Depends(port)) -> Model:
+    experiment = await experiments.get(id)
+    if experiment is None:
+        raise HTTPException(status_code.HTTP_404_NOT_FOUND, detail='Experiment not found')
+    model = await experiments.models.get_by_hash(hash, experiment)
+    if model is None:
+        raise HTTPException(status_code.HTTP_404_NOT_FOUND, detail='Model not found')
+    return model
+
 @router.get('/models/{id}/')
 async def get_model(id: UUID = Path(...), experiments: Experiments = Depends(port)) -> Model:
     model = await experiments.models.get(id)
@@ -35,8 +45,7 @@ async def get_model(id: UUID = Path(...), experiments: Experiments = Depends(por
 
 @router.patch('/models/{id}/', status_code=status_code.HTTP_204_NO_CONTENT)
 async def update_model(model: Model, id: UUID = Path(...), experiments: Experiments = Depends(port)):
-    model = await experiments.models.get(id)
-    if model is None:
+    if not await experiments.models.get(id):
         raise HTTPException(status_code.HTTP_404_NOT_FOUND, detail='Model not found')
     await experiments.models.update(model)
     return Response(status_code=status_code.HTTP_204_NO_CONTENT)

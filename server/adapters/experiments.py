@@ -7,12 +7,15 @@ from server.schemas import Experiment
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from server.adapters.models import Models
 
-
 class Experiments(Collection):
     def __init__(self, database: AsyncIOMotorDatabase):
         self.key = UUID('00000000-0000-0000-0000-000000000000')
         self.collection = database['experiments']
         self.models = Models(database)
+
+    def create(self, **kwargs) -> Experiment:
+        experiment = Experiment(id=uuid4(), **kwargs)
+        return experiment
 
     @override
     async def add(self, experiment: Experiment):
