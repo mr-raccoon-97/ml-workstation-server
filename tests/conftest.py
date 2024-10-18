@@ -1,7 +1,7 @@
 import pytest
 from typing import AsyncGenerator
 from server.settings import Settings, MongoDBSettings
-from server.adapters import RabbitMQ, MongoDB
+from server.adapters import MongoDB
 from server.adapters.experiments import Experiments
 
 @pytest.fixture

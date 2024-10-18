@@ -8,11 +8,9 @@ from messagebus.settings import Settings
 
 logger = getLogger(__name__)
 
-async def consume(topic: str, channel: Channel, callback: Callable, settings: Settings):
+async def consume(topic: str, channel: Channel, callback: Callable, session: ClientSession):
     queue = await channel.get_queue(topic)
-    async with ClientSession(base_url=settings.api.uri) as session:
-        queue = await channel.get_queue(topic)
-        await queue.consume(partial(callback, session=session))
+    await queue.consume(partial(callback, session=session))
 
 class RabbitMQ:
     def __init__(self, settings: Settings):
@@ -34,16 +32,22 @@ class RabbitMQ:
             await channel.set_qos(prefetch_count=self.settings.rabbitmq.prefetch_count)
             await channel.declare_queue(topic, durable=True)
             self.channels[topic] = channel
-            self.tasks.append(create_task(consume(topic, channel, handler, self.settings)))
+        
+        logger.info("Channels created.")
+        logger.info("Creating session")
+        self.session = ClientSession(base_url=self.settings.api.uri)
     
     async def start_consuming(self):
         logger.info("Consuming messages (Press CTRL+C to quit)")
+        for topic, channel in self.channels.items():
+            self.tasks.append(create_task(consume(topic, channel, self.handlers[topic], self.session)))
         await gather(*self.tasks)        
     
     async def teardown(self):
         for task in self.tasks:
             task.cancel()
-
+        
+        await self.session.close()
         logger.info("Closing channels")
         for topic, channel in self.channels.items():
             await channel.close()

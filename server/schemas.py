@@ -3,10 +3,11 @@ from uuid import UUID
 from datetime import datetime
 from pydantic import BaseModel
 from pydantic import Field
+from pydantic import field_validator
 
 class Schema(BaseModel):
     ...
-
+    
 class Experiment(Schema):
     id: Optional[UUID] = Field(default=None)
     name: str

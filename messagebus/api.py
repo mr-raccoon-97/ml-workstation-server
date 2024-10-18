@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from asyncio import gather
+from aiohttp import ClientSession
 from messagebus.settings import Settings
 from messagebus.handlers import handle_metrics, handle_transactions, handle_models
 from messagebus.adapter import RabbitMQ
