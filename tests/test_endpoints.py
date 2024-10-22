@@ -1,5 +1,6 @@
 import pytest
 from uuid import uuid4
+from uuid import UUID
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 from httpx import AsyncClient, ASGITransport
@@ -67,6 +68,7 @@ async def test_models(client: AsyncClient):
 
     logger.info("Creating a new model")
     response = await client.post(f'/experiments/{experiment_id}/models/', json={
+        "signature": {"input_size": "int", "output_size": "int"},
         "hash": "123",
         "name": "mnist-mlp",
         "args": [],
@@ -95,6 +97,7 @@ async def test_models(client: AsyncClient):
 
     logger.info("Updating model")
     response = await client.patch(f"/models/{response.json()['id']}/", json={
+        "signature": {"input_size": "int", "output_size": "int"},
         "hash": "123",
         "name": "mnist-mlp",
         "args": [],
@@ -105,6 +108,7 @@ async def test_models(client: AsyncClient):
 
     logger.info("Attempting to update a non-existent model")
     response = await client.patch(f"/models/{uuid4()}/", json={
+        "signature": {"input_size": "int", "output_size": "int"},
         "hash": "123",
         "name": "mnist-mlp",
         "args": [],
@@ -127,6 +131,7 @@ async def test_metrics(client: AsyncClient):
 
     logger.info("Creating a new model")
     response = await client.post(f'/experiments/{experiment_id}/models/', json={
+        "signature": {"input_size": "int", "output_size": "int"},
         "hash": "123",
         "name": "mnist-mlp",
         "args": [],
@@ -179,6 +184,7 @@ async def test_transactions(client: AsyncClient):
 
     logger.info("Creating a new model")
     response = await client.post(f'/experiments/{experiment_id}/models/', json={
+        "signature": {"input_size": "int", "output_size": "int"},
         "hash": "123",
         "name": "mnist-mlp",
         "args": [],
@@ -197,21 +203,24 @@ async def test_transactions(client: AsyncClient):
         "start": start_time,
         "end": end_time,
         "criterion": {
+            "signature": {},
             "hash": "123",
             "name": "CrossEntropy",
             "args": [],
             "kwargs": {}
         },
         "optimizer": {
+            "signature": {"lr": "str"},
             "hash": "456",
             "name": "Adam",
             "args": [],
-            "kwargs": {}
+            "kwargs": {"lr": 0.001}
         },
         "iterations": [
             {
                 "phase": "train",
                 "dataset": {
+                    "signature": {"normalize": "bool"},
                     "hash": "789",
                     "name": "mnist",
                     "args": [],

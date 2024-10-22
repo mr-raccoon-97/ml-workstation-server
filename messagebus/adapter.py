@@ -47,6 +47,7 @@ class RabbitMQ:
         for task in self.tasks:
             task.cancel()
         
+        logger.info("Closing http session")
         await self.session.close()
         logger.info("Closing channels")
         for topic, channel in self.channels.items():

@@ -14,6 +14,7 @@ class Experiment(Schema):
 
 class Model(Schema):
     id: Optional[UUID] = Field(default=None)
+    signature: dict
     hash: str
     name: str
     args: tuple
@@ -28,18 +29,21 @@ class Metric(Schema):
     value: float
 
 class Criterion(Schema):
+    signature: dict
     hash: str
     name: str
     args: tuple
     kwargs: dict    
 
 class Optimizer(Schema):
+    signature: dict
     hash: str
     name: str
     args: tuple
     kwargs: dict
 
 class Dataset(Schema):
+    signature: dict
     hash: str
     name: str
     args: tuple
