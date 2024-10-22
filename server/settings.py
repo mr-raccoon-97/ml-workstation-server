@@ -4,7 +4,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
-class MongoDBSettings(BaseSettings):
+class DatabaseSettings(BaseSettings):
+    ...
+
+class MongoDBSettings(DatabaseSettings):
     host: str = Field(default='localhost')
     port: int = Field(default=27017)
     database: str = Field(default='tests')
@@ -13,6 +16,12 @@ class MongoDBSettings(BaseSettings):
     @property
     def uri(self):
         return f"mongodb://{self.host}:{self.port}"
+    
+class AtlasSettings(DatabaseSettings):
+    uri: str = Field(...)
+    database: str = Field(...)
+    model_config = SettingsConfigDict(env_prefix='atlas_')
+
 
 class APISettings(BaseSettings):
     host: str = Field(default='localhost')
@@ -24,4 +33,4 @@ class APISettings(BaseSettings):
 
 class Settings(BaseSettings):
     api: APISettings = Field(default_factory=APISettings)
-    mongodb: MongoDBSettings = Field(default_factory=MongoDBSettings)
+    database: DatabaseSettings = Field(default_factory=MongoDBSettings)

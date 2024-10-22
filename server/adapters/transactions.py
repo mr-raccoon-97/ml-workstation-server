@@ -24,3 +24,9 @@ class Transactions(Collection):
         if document is None:
             return []
         return [Transaction.model_validate(document) for document in document['transactions']]
+    
+    @override
+    async def clean(self, model: Model):
+        filter = {'_id': str(model.id)}
+        update = {'$set': {'transactions': []}}
+        await self.collection.update_one(filter, update)

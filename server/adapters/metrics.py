@@ -25,3 +25,9 @@ class Metrics(Collection):
         if document is None:
             return []
         return [Metric.model_validate(document) for document in document['metrics']]
+    
+    @override
+    async def clean(self, model: Model):
+        filter = {'_id': str(model.id)}
+        update = {'$set': {'metrics': []}}
+        await self.collection.update_one(filter, update)

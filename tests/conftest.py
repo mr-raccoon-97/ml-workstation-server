@@ -6,7 +6,7 @@ from server.adapters.experiments import Experiments
 
 @pytest.fixture
 def settings():
-    return Settings(mongodb=MongoDBSettings(database='tests'))
+    return Settings(database=MongoDBSettings(database='tesis'))
 
 @pytest.fixture
 async def mongodb(settings: Settings) -> AsyncGenerator[MongoDB, None]:

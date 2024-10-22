@@ -54,6 +54,18 @@ class Models(Collection):
 
     @override
     async def remove(self, model: Model):
+        await self.metrics.clean(model)
+        await self.transactions.clean(model)
         filter = {'models.id': str(model.id)}
         update = {'$pull': {'models': {'id': str(model.id)}}}
+        await self.collection.update_one(filter, update)
+
+    @override
+    async def clean(self, experiment: Experiment):
+        models = await self.list(experiment)
+        for model in models:
+            await self.metrics.clean(model)
+            await self.transactions.clean(model)
+        filter = {'_id': str(experiment.id)}
+        update = {'$set': {'models': []}}
         await self.collection.update_one(filter, update)

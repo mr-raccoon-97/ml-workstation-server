@@ -31,6 +31,7 @@ class Experiments(Collection):
 
     @override
     async def remove(self, experiment: Experiment):
+        await self.models.clean(experiment)
         filter = {'_id': str(self.key)}
         update = {'$pull': {'experiments': {'id': str(experiment.id)}}}
         await self.collection.update_one(filter, update)

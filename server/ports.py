@@ -14,6 +14,9 @@ class Metrics(ABC):
     @abstractmethod
     async def list(self, model: Model) -> list[Metric]:...
 
+    @abstractmethod
+    async def clean(self, model: Model):...
+
 
 class Transactions(ABC):
 
@@ -26,6 +29,8 @@ class Transactions(ABC):
     @abstractmethod
     async def list(self, model: Model) -> list[Transaction]:...
 
+    @abstractmethod
+    async def clean(self, model: Model):...
 
 class Models(ABC):
     metrics: Metrics
@@ -51,6 +56,9 @@ class Models(ABC):
 
     @abstractmethod
     async def remove(self, model: Model):...
+
+    @abstractmethod
+    async def clean(self, experiment: Experiment):...
 
 
 class Experiments(ABC):

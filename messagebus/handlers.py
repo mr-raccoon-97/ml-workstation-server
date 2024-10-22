@@ -7,7 +7,7 @@ logger = getLogger(__name__)
         
 def is_ok(response: ClientResponse):
     match response.status:
-        case 201 | 204:
+        case 200 | 201 | 204:
             return True            
         case 404 | 409 | 422:
             return False
