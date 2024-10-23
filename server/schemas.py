@@ -55,7 +55,7 @@ class Iteration(Schema):
     kwargs: dict
 
 class Transaction(Schema):
-    id: Optional[UUID] = Field(default=None)
+    hash: str
     epochs: tuple[int, int]
     start: datetime
     end: datetime

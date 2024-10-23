@@ -22,9 +22,15 @@ class Transactions(ABC):
 
     @abstractmethod
     def create(self, **kwargs) -> Transaction:...
-    
+
+    @abstractmethod
+    async def exists(self, hash: str) -> bool:...
+
     @abstractmethod
     async def add(self, transaction: Transaction, model: Model):...
+
+    @abstractmethod
+    async def update(self, transaction: Transaction, model: Model):...
 
     @abstractmethod
     async def list(self, model: Model) -> list[Transaction]:...

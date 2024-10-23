@@ -19,6 +19,18 @@ class Transactions(Collection):
         await self.collection.update_one(filter, update, upsert=True)
 
     @override
+    async def update(self, transaction: Transaction, model: Model):
+        filter = {'_id': str(model.id), 'transactions.hash': transaction.hash}
+        update = {'$set': {'transactions.$': transaction.model_dump(mode='json')}}
+        await self.collection.update_one(filter, update)
+
+    @override
+    async def exists(self, hash: str, model: Model) -> bool:
+        filter = {'_id': str(model.id), 'transactions.hash': hash}
+        document = await self.collection.find_one(filter)
+        return True if document else False
+
+    @override
     async def list(self, model: Model) -> list[Transaction]:
         document = await self.collection.find_one({'_id': str(model.id)})
         if document is None:

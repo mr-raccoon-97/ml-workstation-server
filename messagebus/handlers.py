@@ -23,13 +23,13 @@ async def handle_models(message: IncomingMessage, session: ClientSession):
         logger.info(f"Processing model with ID {id}")
         async with await session.patch(f'/models/{id}/', data=message.body, headers={'Content-Type': 'application/json'}) as response:
             await message.ack() if is_ok(response) else await message.nack(requeue=False)
-
                 
 async def handle_transactions(message: IncomingMessage, session: ClientSession):
     async with message.process(requeue=True, ignore_processed=True):
         id = message.headers['X-Resource-ID']
+        hash = message.headers['X-Resource-Hash']
         logger.info(f"Processing transaction for model with ID {id}")
-        async with await session.post(f'/models/{id}/transactions/', data=message.body, headers={'Content-Type': 'application/json'}) as response:
+        async with await session.put(f'/models/{id}/transactions/{hash}/', data=message.body, headers={'Content-Type': 'application/json'}) as response:
             await message.ack() if is_ok(response) else await message.nack(requeue=False)
 
 async def handle_metrics(message: IncomingMessage, session: ClientSession):

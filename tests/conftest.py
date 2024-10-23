@@ -6,7 +6,7 @@ from server.adapters.experiments import Experiments
 
 @pytest.fixture
 def settings():
-    return Settings(database=MongoDBSettings(database='tesis'))
+    return Settings(database=MongoDBSettings(database='tests'))
 
 @pytest.fixture
 async def mongodb(settings: Settings) -> AsyncGenerator[MongoDB, None]:
@@ -24,3 +24,5 @@ async def experiments(mongodb: MongoDB) -> AsyncGenerator[Experiments, None]:
     finally:
         await mongodb.database['experiments'].drop()
         await mongodb.database['models'].drop()
+        await mongodb.database['metrics'].drop()
+        await mongodb.database['transactions'].drop()

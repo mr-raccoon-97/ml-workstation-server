@@ -22,6 +22,19 @@ async def add_transaction_to_model(transaction: Transaction, id: UUID = Path(...
     await models.transactions.add(transaction, model)
     return transaction
 
+@router.put('/models/{id}/transactions/{hash}/')
+async def put_create_or_update_transaction(transaction: Transaction, id: UUID = Path(...), hash: str = Path(...), models: Models = Depends(port)) -> Response:
+    model = await models.get(id)
+    if model is None:
+        raise HTTPException(status_code.HTTP_404_NOT_FOUND, detail='Model not found')
+    transaction = models.transactions.create(**transaction.model_dump())
+    if await models.transactions.exists(hash, model):
+        await models.transactions.update(transaction, model)
+        return Response(status_code=status_code.HTTP_204_NO_CONTENT)
+    else:
+        await models.transactions.add(transaction, model)
+        return Response(status_code=status_code.HTTP_201_CREATED)
+
 @router.get('/models/{id}/transactions/')
 async def get_transactions_from_model(id: UUID = Path(...), models: Models = Depends(port)) -> list[Transaction]:
     model = await models.get(id)

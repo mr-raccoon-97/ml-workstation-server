@@ -200,6 +200,7 @@ async def test_transactions(client: AsyncClient):
     
     logger.info("Adding transactions to model")
     response = await client.post(f'/models/{model_id}/transactions/', json={"epochs": [1, 10],
+        "hash": "123",
         "start": start_time,
         "end": end_time,
         "criterion": {
@@ -237,3 +238,86 @@ async def test_transactions(client: AsyncClient):
     response = await client.get(f'/models/{model_id}/transactions/')
     assert response.status_code == status_code.HTTP_200_OK
     assert len(response.json()) == 1
+
+    
+    response = await client.put(f'/models/{model_id}/transactions/{"123"}/', json={"epochs": [1, 15],
+        "hash": "123",
+        "start": start_time,
+        "end": end_time,
+        "criterion": {
+            "signature": {},
+            "hash": "123",
+            "name": "CrossEntropy",
+            "args": [],
+            "kwargs": {}
+        },
+        "optimizer": {
+            "signature": {"lr": "str"},
+            "hash": "456",
+            "name": "Adam",
+            "args": [],
+            "kwargs": {"lr": 0.001}
+        },
+        "iterations": [
+            {
+                "phase": "train",
+                "dataset": {
+                    "signature": {"normalize": "bool"},
+                    "hash": "789",
+                    "name": "mnist",
+                    "args": [],
+                    "kwargs": {}
+                },
+                "kwargs": {}
+            }
+        ]
+        })
+    
+    assert response.status_code == status_code.HTTP_204_NO_CONTENT
+    
+    response = await client.get(f'/models/{model_id}/transactions/')
+    assert response.status_code == status_code.HTTP_200_OK
+    assert len(response.json()) == 1
+
+    assert response.json()[0]['epochs'] == [1, 15]
+
+    
+    response = await client.put(f'/models/{model_id}/transactions/{"1234"}/', json={"epochs": [1, 15],
+        "hash": "1234",
+        "start": start_time,
+        "end": end_time,
+        "criterion": {
+            "signature": {},
+            "hash": "123",
+            "name": "CrossEntropy",
+            "args": [],
+            "kwargs": {}
+        },
+        "optimizer": {
+            "signature": {"lr": "str"},
+            "hash": "456",
+            "name": "Adam",
+            "args": [],
+            "kwargs": {"lr": 0.001}
+        },
+        "iterations": [
+            {
+                "phase": "train",
+                "dataset": {
+                    "signature": {"normalize": "bool"},
+                    "hash": "789",
+                    "name": "mnist",
+                    "args": [],
+                    "kwargs": {}
+                },
+                "kwargs": {}
+            }
+        ]
+    })
+
+    assert response.status_code == status_code.HTTP_201_CREATED
+    
+    
+    response = await client.get(f'/models/{model_id}/transactions/')
+    assert response.status_code == status_code.HTTP_200_OK
+    assert len(response.json()) == 2
